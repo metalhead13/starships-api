@@ -1,3 +1,9 @@
+from fastapi import APIRouter, HTTPException
+import requests
+
+
+# Definición del router friking que falta en el main.py
+router = APIRouter()
 @router.get("/piloto/{id}")
 async def get_pilot(id: int):
     url = f"https://swapi.py4e.com/api/people/{id}/"

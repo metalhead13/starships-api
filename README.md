@@ -1,5 +1,5 @@
 API de Naves Estelares de Star Wars para los Andes no usar en producción.
-Desarrollador por:@metalhead13
+Desarrollado por:@metalhead13 > para : UAndes
 La API de Naves Estelares de Star Wars es una aplicación basada en FastAPI que proporciona información sobre naves estelares y pilotos del universo de Star Wars.
 
 Esta API funciona como un envoltorio alrededor de la API de Star Wars (SWAPI), ofreciendo endpoints para recuperar información general y específica sobre naves estelares, así como detalles sobre los pilotos. También incluye funcionalidad para actualizar la información de las naves en una base de datos en memoria.

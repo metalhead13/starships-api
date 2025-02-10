@@ -5,7 +5,7 @@ from app.routes import ships, pilots, update
 app = FastAPI(title="Star Wars API")
 
 # Configure CORS
-origins = ["*"]  # Adjust origins as needed for production
+origins = ["*"]  # Ajsutar para producción
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -21,4 +21,4 @@ app.include_router(update.router, prefix="/api")
 
 @app.get("/")
 async def root():
-    return {"mensaje": "API de Star Wars funcionando"}
+    return {"mensaje": "La API esta funcional mi señoro Oscuro"}

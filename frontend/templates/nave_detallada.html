@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/" class="text-light">Naves</a></li>
+                    <li class="breadcrumb-item active text-light" aria-current="page">Detalles de Nave</li>
+                </ol>
+            </nav>
+
+            <div class="card bg-black text-light">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">
+                        <i class="fas fa-space-shuttle text-warning me-2"></i>
+                        <span id="naveName">Detalles de la Nave</span>
+                    </h3>
+                    <button class="btn btn-warning" onclick="toggleEditMode()">
+                        <i class="fas fa-edit"></i> Editar
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <h4 class="text-warning">Información Básica</h4>
+                                <div class="form-group mb-3">
+                                    <label class="form-label">Nombre</label>
+                                    <input type="text" class="form-control bg-dark text-light" id="nombre" readonly>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label class="form-label">Modelo</label>
+                                    <input type="text" class="form-control bg-dark text-light" id="modelo" readonly>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label class="form-label">Costo en Créditos</label>
+                                    <input type="text" class="form-control bg-dark text-light" id="costo" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <h4 class="text-warning">Especificaciones Técnicas</h4>
+                                <div class="form-group mb-3">
+                                    <label class="form-label">Velocidad Máxima</label>
+                                    <input type="text" class="form-control bg-dark text-light" id="velocidad" readonly>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label class="form-label">Capacidad de Personal</label>
+                                    <input type="text" class="form-control bg-dark text-light" id="capacidadPersonal" readonly>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label class="form-label">Capacidad de Pasajeros</label>
+                                    <input type="text" class="form-control bg-dark text-light" id="capacidadPasajeros" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="actionButtons" style="display: none;">
+                        <hr class="border-secondary">
+                        <div class="d-flex justify-content-end gap-2">
+                            <button class="btn btn-secondary" onclick="cancelEdit()">
+                                <i class="fas fa-times"></i> Cancelar
+                            </button>
+                            <button class="btn btn-success" onclick="saveChanges()">
+                                <i class="fas fa-save"></i> Guardar Cambios
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección de Pilotos Asignados -->
+            <div class="card bg-black text-light mt-4">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        <i class="fas fa-users text-warning me-2"></i>
+                        Pilotos Asignados
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Especie</th>
+                                    <th>Planeta de Origen</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pilotosAsignados">
+                                <!-- Contenido dinámico de pilotos -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let originalData = {};
+let isEditMode = false;
+
+function toggleEditMode() {
+    isEditMode = !isEditMode;
+    const inputs = document.querySelectorAll('.form-control');
+    const actionButtons = document.getElementById('actionButtons');
+    
+    inputs.forEach(input => {
+        input.readOnly = !isEditMode;
+    });
+    
+    actionButtons.style.display = isEditMode ? 'block' : 'none';
+}
+
+function cancelEdit() {
+    // Restaurar valores originales
+    Object.keys(originalData).forEach(key => {
+        const input = document.getElementById(key);
+        if (input) input.value = originalData[key];
+    });
+    toggleEditMode();
+}
+
+async function saveChanges() {
+    const naveData = {
+        nombre: document.getElementById('nombre').value,
+        modelo: document.getElementById('modelo').value,
+        costo: document.getElementById('costo').value,
+        velocidad: document.getElementById('velocidad').value,
+        capacidad_personal: document.getElementById('capacidadPersonal').value,
+        capacidad_pasajeros: document.getElementById('capacidadPasajeros').value
+    };
+
+    try {
+        const response = await fetch(`/api/naves/${originalData.nombre}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(naveData)
+        });
+
+        const data = await response.json();
+        if (data.status === 'success') {
+            showAlert('Nave actualizada correctamente', 'success');
+            originalData = {...naveData};
+            toggleEditMode();
+        }
+    } catch (error) {
+        showAlert('Error al actualizar la nave', 'danger');
+        console.error('Error:', error);
+    }
+}
+
+function showAlert(message, type) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.querySelector('.container').insertBefore(alertDiv, document.querySelector('.container').firstChild);
+    
+    setTimeout(() => {
+        alertDiv.remove();
+    }, 3000);
+}
+</script>
+{% endblock %}
